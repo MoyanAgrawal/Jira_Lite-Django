@@ -11,6 +11,9 @@ from .models import ActivityLog
 from django.contrib.auth.views import LogoutView
 from django.contrib.auth import logout
 
+
+
+
 class RoleRequiredMixin(UserPassesTestMixin):
     allowed_roles = [] 
 
@@ -19,6 +22,8 @@ class RoleRequiredMixin(UserPassesTestMixin):
         if not profile:
             return False
         return profile.role in self.allowed_roles
+
+
 
 # Signup
 def signup(request):
@@ -33,7 +38,7 @@ def signup(request):
             user.email = form.cleaned_data.get('email')
             user.save()
 
-            profile = user.profile  # created by signal
+            profile = user.profile
             profile.role = role
 
             if role == 'admin':
@@ -57,6 +62,8 @@ def signup(request):
 
 
 
+
+
 class LogoutGetView(LogoutView):
     def get(self, request, *args, **kwargs):
         return self.full_logout(request)
@@ -65,18 +72,20 @@ class LogoutGetView(LogoutView):
         return self.full_logout(request)
 
     def full_logout(self, request):
-        # Clear everything from session
+        
         request.session.flush()
 
-        # Call Django logout to clear user info
+        
         logout(request)
 
-        # Optional: clear cookies explicitly if you have custom cookies
-        response = super().get(request)  # or self.get_success_url()
+        
+        response = super().get(request)
         for cookie in request.COOKIES:
             response.delete_cookie(cookie)
         return response
     
+
+
 
 
 # Project list
@@ -108,12 +117,14 @@ class ProjectCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
 
 
 
+
 class ProjectDetailView(LoginRequiredMixin, DetailView):
     model = Project
     template_name = 'core/project_detail.html'
     context_object_name = 'project'
     def get_queryset(self):
         return Project.objects.filter(organization=self.request.user.profile.organization)
+
 
 
 
@@ -140,23 +151,25 @@ class TaskCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
 
 
 
-# Task update (Managers OR assigned user)
+
+
+# Task update (Managers or assigned user)
 class TaskUpdateView(LoginRequiredMixin, UpdateView):
     model = Task
     form_class = TaskForm
     template_name = 'core/task_form.html'
     def get_queryset(self):
-        # limit to tasks inside user's organization
+        
         return Task.objects.filter(project__organization=self.request.user.profile.organization)
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
-        # allow if manager/admin OR assignee
+        
         role = request.user.profile.role
         if role in ('admin','manager') or self.object.assignee == request.user:
             return super().dispatch(request, *args, **kwargs)
         return redirect('project_detail', pk=self.object.project.pk)
     def form_valid(self, form):
-        # capture changes for activity log
+        
         original = Task.objects.get(pk=self.object.pk)
         response = super().form_valid(form)
         changes = []
@@ -171,6 +184,8 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
         return response
     def get_success_url(self):
         return reverse_lazy('task_detail', kwargs={'pk': self.object.pk})
+
+
 
 
 
@@ -201,6 +216,8 @@ class TaskDetailView(LoginRequiredMixin, DetailView):
 
 
 
+
+
 # Project delete (managers/admins)
 class ProjectDeleteView(LoginRequiredMixin, RoleRequiredMixin, DeleteView):
     model = Project
@@ -213,6 +230,8 @@ class ProjectDeleteView(LoginRequiredMixin, RoleRequiredMixin, DeleteView):
 
 
 
+
+
 # Project Edit (managers/admins)
 class ProjectUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
     model = Project
@@ -221,7 +240,7 @@ class ProjectUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
     allowed_roles = ['admin', 'manager']
 
     def get_queryset(self):
-        # Only allow editing projects in the user's organization
+        
         return Project.objects.filter(organization=self.request.user.profile.organization)
 
     def get_success_url(self):
