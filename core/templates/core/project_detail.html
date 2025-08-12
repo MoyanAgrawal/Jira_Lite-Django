@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="text-center">{{ project.name }}</h2>
+<p class="text-center">{{ project.description }}</p>
+<h4>Tasks</h4>
+<div>
+    <a class="btn btn-sm btn-success mb-2" href="{% url 'task_create' project.pk %}">Create Task</a>
+    <a class="btn btn-sm btn-danger mb-2" href="{% url 'project_delete' project.pk %}">Delete Project</a>
+</div>
+<div class="row g-3">
+    {% for task in project.tasks.all %}
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ task.title }}</h5>
+                <p class="card-text">
+                    <span class="badge 
+                        {% if task.status == 'todo' %}bg-secondary
+                        {% elif task.status == 'inprogress' %}bg-warning text-dark
+                        {% elif task.status == 'done' %}bg-success
+                        {% endif %}">
+                        {{ task.get_status_display }}
+                    </span>
+                </p>
+                {% if task.description %}
+                <p class="card-text text-muted">{{ task.description|truncatewords:20 }}</p>
+                {% endif %}
+                <a href="{% url 'task_detail' task.pk %}" class="btn btn-primary btn-sm">View Task</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">No tasks</div>
+    </div>
+    {% endfor %}
+</div>
+<div class="text-center mt-3">
+    <button class="btn btn-primary d-inline mt-3" onclick="window.history.back()">&larr;Back</button>
+
+</div>
+{% endblock %}

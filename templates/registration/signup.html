@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-lg p-4" style="width: 400px;">
+        <h3 class="text-center mb-4">Sign Up</h3>
+        <form method="post">
+            {% csrf_token %}
+            
+            <h5 class="text-danger mb-3">
+                {{ form.non_field_errors }}
+            </h5>
+            
+
+            <div class="mb-3">
+                {{ form.username.label_tag }}
+                {{ form.username }}
+                {{ form.username.errors }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.email.label_tag }}
+                {{ form.email }}
+                {{ form.email.errors }}
+            </div>
+
+            <div class="mb-3 d-flex flex-column">
+                {{ form.password1.label_tag }}
+                {{ form.password1 }}
+                {{ form.password1.errors }}
+            </div>
+
+            <div class="mb-3 d-flex flex-column">
+                {{ form.password2.label_tag }}
+                {{ form.password2 }}
+                {{ form.password2.errors }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.role.label_tag }}
+                {{ form.role }}
+                {{ form.role.errors }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.organization_name.label_tag }}
+                {{ form.organization_name }}
+                {{ form.organization_name.errors }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.organization.label_tag }}
+                {{ form.organization }}
+                {{ form.organization.errors }}
+            </div>
+
+            <button class="btn btn-primary w-100" type="submit">Sign up</button>
+        </form>
+        <div class="text-center mt-3">
+            <small>
+                Already have an account?
+                <a href="{% url 'login' %}">Login</a>
+            </small>
+        </div>
+    </div>
+</div>
+
+<script>
+    const roleField = document.getElementById("id_role");
+    const orgNameDiv = document.getElementById("id_organization_name").parentElement;
+    const orgSelectDiv = document.getElementById("id_organization").parentElement;
+
+    function toggleOrgFields() {
+        if (roleField.value === 'admin') {
+            orgNameDiv.style.display = 'block';
+            orgSelectDiv.style.display = 'none';
+        } else {
+            orgNameDiv.style.display = 'none';
+            orgSelectDiv.style.display = 'block';
+        }
+    }
+
+    roleField.addEventListener('change', toggleOrgFields);
+    toggleOrgFields();
+</script>
+{% endblock %}

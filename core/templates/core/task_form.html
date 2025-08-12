@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-lg p-4" style="width: 400px;">
+        <h3 class="text-center mb-4">
+            {% if view.object %}
+            Edit
+            {% else %}
+            Create
+            {% endif %}
+            Task
+        </h3>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            {% for field in form %}
+            <div class="mb-3">
+                {{ field.label_tag }}
+                {{ field }}
+                {{ field.errors }}
+            </div>
+            {% endfor %}
+
+            <button class="btn btn-primary w-100" type="submit">Save</button>
+        </form>
+        <div class="text-center mt-3">
+            <button class="btn btn-primary d-inline mt-3" onclick="window.history.back()">&larr;Back</button>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

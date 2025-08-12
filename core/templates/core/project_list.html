@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Projects</h2>
+{% if user.profile.role in 'admin manager' %}
+<a class="btn btn-success mb-3" href="{% url 'project_create' %}">Create Project</a>
+{% endif %}
+<div class="row g-3">
+    {% for project in projects %}
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ project.name }}</h5>
+                {% if project.description %}
+                <p class="card-text text-muted">{{ project.description|truncatewords:20 }}</p>
+                {% endif %}
+                <a href="{% url 'project_detail' project.pk %}" class="btn btn-primary btn-sm">View Project</a>
+                <a href="{% url 'project_edit' project.pk %}" class="btn btn-secondary btn-sm">Edit Project</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">No projects yet</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
